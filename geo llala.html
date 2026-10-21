@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMZO — Your Digital Workspace</title>
+<style>
+:root{
+  --bg:#020b17;--panel:#061426;--card:#071629;--line:#152b46;
+  --text:#edf4ff;--muted:#91a7c4;--blue:#3478ff;--cyan:#54dafa;
+  --purple:#853eff;--green:#20dbb1;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:14px}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.sidebar{border-right:1px solid var(--line);padding:24px 18px;display:flex;flex-direction:column;min-height:100vh;background:#020b16}
+.brand{font-size:27px;font-weight:850;letter-spacing:-1.5px;margin:0 10px 34px;display:flex;align-items:center;gap:12px}
+.logo{width:30px;height:30px;background:linear-gradient(135deg,#a14dff,#237bff);clip-path:polygon(50% 0,100% 100%,75% 100%,50% 42%,24% 100%,0 100%);border-radius:8px}
+.nav{display:grid;gap:6px}
+.nav button{border:0;background:transparent;color:#c2d2e9;padding:13px 14px;text-align:left;border-radius:10px;display:flex;gap:13px;align-items:center;transition:.2s}
+.nav button:hover,.nav button.active{background:#102a61;color:white}
+.nav button.active{box-shadow:inset 3px 0 #4288ff}
+.ico{width:20px;text-align:center;font-size:18px}
+.premium{margin-top:auto;border:1px solid #253b79;border-radius:14px;padding:16px;background:radial-gradient(ellipse at 70% 0,#332180 0,transparent 60%),#061329}
+.premium .orb{height:75px;font-size:52px;color:#9571ff;text-align:center;text-shadow:0 0 28px #804dff}
+.premium h3{margin:8px 0}
+.premium p,.muted{color:var(--muted);line-height:1.65}
+.primary{border:0;background:linear-gradient(100deg,#2867ff,#426cff);color:white;padding:11px 15px;border-radius:9px}
+.storage{margin:26px 4px 0;color:var(--muted);font-size:12px}
+.track{height:6px;background:#11253d;border-radius:9px;margin-top:10px;overflow:hidden}
+.track span{display:block;width:25%;height:100%;background:#3b7bff;border-radius:9px}
+main{min-width:0}
+.topbar{height:66px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;gap:18px}
+.search{flex:1;max-width:650px;position:relative}
+.search input{width:100%;background:#07182b;border:1px solid #1b3049;border-radius:11px;color:white;padding:13px 16px 13px 40px;outline:none}
+.search input:focus{border-color:#3b77ff}
+.search span{position:absolute;left:14px;top:12px;font-size:18px}
+.top-action{border:0;background:transparent;color:#dceaff;font-size:20px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#4169e1,#8d54ff);display:grid;place-items:center;font-weight:800}
+.user{display:flex;align-items:center;gap:10px;border-left:1px solid var(--line);padding-left:16px}
+.user small{display:block;color:var(--muted);margin-top:4px}
+.content{padding:16px 22px 30px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px}
+.hero{min-height:340px;border:1px solid #183b77;border-radius:14px;overflow:hidden;position:relative;padding:42px 36px;background:radial-gradient(ellipse at 67% 40%,#092c80 0,#041e4a 29%,transparent 63%),linear-gradient(115deg,#061a31,#041027 75%);display:flex;align-items:center}
+.hero:before{content:"";position:absolute;width:260px;height:260px;right:24%;top:30px;border-radius:43% 57% 60% 40%;border:2px solid #44a9ff;box-shadow:0 0 30px #007bff, inset 0 0 38px #4d42ff;transform:rotate(-30deg);background:linear-gradient(135deg,#009fff55,#612eff55);animation:float 7s ease-in-out infinite}
+.hero:after{content:"";position:absolute;width:230px;height:230px;right:26%;top:50px;border-radius:50%;border:2px solid #8a60ff;transform:rotate(48deg) scaleX(.5);box-shadow:0 0 25px #4d8dff}
+@keyframes float{50%{transform:translateY(-10px) rotate(-15deg)}}
+.hero-copy{position:relative;z-index:2;max-width:350px}
+.eyebrow{font-size:12px;letter-spacing:1.6px;color:#bcd9ff}
+.hero h1{font-size:clamp(34px,3vw,46px);line-height:1.08;letter-spacing:-1.7px;margin:14px 0}
+.hero h1 span{color:#4487ff}
+.hero p{color:#c0d1e8;line-height:1.8;max-width:340px}
+.hero .primary{margin-top:9px;padding:13px 20px;border-radius:28px}
+.hero-links{position:absolute;right:3%;top:13%;width:174px;z-index:3;display:grid;gap:6px}
+.hero-links button{border:1px solid #274a80;background:#061b3cdd;color:white;text-align:left;padding:12px;border-radius:12px;display:flex;align-items:center;gap:10px}
+.hero-links button:hover{background:#143e81}
+.mini-icon{width:35px;height:35px;display:grid;place-items:center;border-radius:10px;background:#143f9a;font-size:18px;flex-shrink:0}
+.hero-links small{display:block;color:#9eb6d7;margin-top:4px;font-size:10px}
+.section{margin-top:27px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}
+h2{font-size:17px;margin:0;font-weight:650}
+.text-link{border:0;background:transparent;color:#5b9aff;font-size:12px}
+.quick-grid,.tool-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.quick,.tool,.project{min-width:0;background:linear-gradient(145deg,#081a2e,#041222);border:1px solid var(--line);border-radius:12px;padding:15px 12px;transition:transform .2s,border-color .2s}
+.quick:hover,.tool:hover,.project:hover{transform:translateY(-3px);border-color:#3567ac}
+.tile-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:12px;font-size:22px;margin-bottom:12px;background:#123263}
+.cyan{background:#0a3446;color:#61e4fa}.violet{background:#32145e;color:#ce8aff}.teal{background:#093c39;color:#58ebd0}.gold{background:#44361d;color:#ffdc80}
+.quick strong,.tool strong{display:block;font-size:12px;font-weight:600;overflow-wrap:anywhere}
+.quick small,.tool small{display:block;color:var(--muted);font-size:11px;margin-top:7px;line-height:1.4}
+.project-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.project{padding:9px}
+.project-art{height:85px;border-radius:8px;display:grid;place-items:center;font-size:39px;margin-bottom:12px;background:linear-gradient(135deg,#1a4368,#10142f)}
+.art2{background:linear-gradient(135deg,#19192f,#54234c)}
+.art3{background:linear-gradient(135deg,#073b4a,#29216b)}
+.art4{background:linear-gradient(135deg,#25344e,#6441a0)}
+.project strong{font-size:12px}
+.project small{display:block;color:var(--muted);font-size:10px;margin-top:7px}
+.tool-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+.tool{padding:13px 10px}
+.right{min-width:0}
+.quote{height:190px;border:1px solid #18324f;border-radius:13px;padding:25px 20px;background:radial-gradient(ellipse at 80% 100%,#4234a5 0,transparent 55%),linear-gradient(145deg,#07162b,#091d39);position:relative;overflow:hidden}
+.quote:after{content:"✦";position:absolute;right:20px;bottom:-12px;font-size:100px;color:#344fa0;opacity:.22}
+.quote blockquote{margin:12px 0;font-size:17px;line-height:1.55;position:relative;z-index:1}
+.quote small{color:#9fb6d5}
+.stat-list,.activity{border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#041222}
+.stat{display:flex;align-items:center;gap:12px;padding:10px 2px}
+.stat .tile-icon{width:38px;height:38px;margin:0;font-size:18px}
+.stat-info{flex:1}.stat-info small{display:block;color:#b7c9e0;font-size:11px}.stat-info strong{display:block;font-size:19px;margin-top:4px}
+.change{font-size:10px;color:var(--green)}
+.activity-item{display:flex;gap:10px;padding:10px 0}
+.activity-item .tile-icon{width:33px;height:33px;font-size:15px;margin:0}
+.activity-item strong{font-size:11px;font-weight:500}
+.activity-item small{display:block;color:var(--muted);font-size:10px;margin-top:5px}
+.connect{border:1px solid #263c86;border-radius:13px;padding:19px;background:radial-gradient(ellipse at 90% 0,#5435b9 0,transparent 50%),#07152c}
+.connect p{color:#bacbe4;line-height:1.6;font-size:12px}
+.connect button{border-radius:20px}
+.page{display:none}.page.active{display:block}
+.page-title{font-size:28px;letter-spacing:-.8px;margin:8px 0}
+.page-intro{color:var(--muted);margin:0 0 24px;line-height:1.6}
+.panel{border:1px solid var(--line);border-radius:14px;background:#061426;padding:20px;margin-bottom:16px}
+.panel input,.panel textarea,.panel select{width:100%;background:#020d1b;color:white;border:1px solid #213750;border-radius:9px;padding:12px;margin:6px 0 12px;outline:none}
+.panel textarea{min-height:130px;resize:vertical}
+.panel label{display:block;color:#b7c9e0;font-size:12px}
+.row-buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px}
+.secondary{border:1px solid #294263;background:#0b1c31;color:#dceaff;padding:10px 14px;border-radius:9px}
+.saved-item{border:1px solid var(--line);border-radius:10px;padding:13px;margin-top:9px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.saved-item small{color:var(--muted)}
+.toast{position:fixed;bottom:22px;right:22px;background:#15396a;border:1px solid #4386ff;padding:13px 18px;border-radius:10px;z-index:10;display:none}
+.mobile-menu{display:none}
+.empty{color:var(--muted);padding:22px 0}
+@media(max-width:1200px){
+ .layout{grid-template-columns:minmax(0,1fr) 265px;gap:15px}
+ .quick-grid,.tool-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .hero-links{right:2%;width:150px}.hero:before{right:19%}.hero:after{right:21%}
+}
+@media(max-width:850px){
+ .app{grid-template-columns:1fr}
+ .sidebar{position:fixed;left:-255px;top:0;width:240px;z-index:20;transition:left .25s;box-shadow:12px 0 35px #0008}
+ .sidebar.open{left:0}
+ .mobile-menu{display:block}
+ .topbar{padding:0 12px;gap:10px}
+ .user .user-label{display:none}
+ .content{padding:13px}
+ .layout{grid-template-columns:1fr}
+ .right{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .right .section{margin-top:0}
+ .hero{padding:30px 24px;min-height:320px}
+ .hero-links{display:none}
+ .hero:before{right:8%;opacity:.65}.hero:after{right:10%;opacity:.65}
+ .hero-copy{max-width:390px}
+ .project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ .quick-grid,.tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .right{grid-template-columns:1fr}
+ .hero{min-height:340px;padding:24px 18px}
+ .hero:before{width:160px;height:160px;right:3%;top:20px}
+ .hero:after{width:140px;height:140px;right:6%;top:30px}
+ .hero-copy{max-width:100%}
+ .hero h1{font-size:36px}
+ .search input{font-size:12px}
+ .project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><span class="logo"></span> AMZO</div>
+  <nav class="nav" id="nav">
+    <button class="active" data-page="home"><span class="ico">⌂</span>Home</button>
+    <button data-page="ai"><span class="ico">✧</span>AI Assistant</button>
+    <button data-page="projects"><span class="ico">▱</span>Projects</button>
+    <button data-page="tools"><span class="ico">✥</span>Tools</button>
+    <button data-page="games"><span class="ico">♧</span>Games</button>
+    <button data-page="notes"><span class="ico">▤</span>Notes</button>
+    <button data-page="files"><span class="ico">▱</span>Files</button>
+    <button data-page="gallery"><span class="ico">▧</span>Gallery</button>
+    <button data-page="settings"><span class="ico">⚙</span>Settings</button>
+  </nav>
+  <div class="premium">
+    <div class="orb">◈</div>
+    <h3>Unlock Premium</h3>
+    <p>Discover new possibilities for your digital workspace.</p>
+    <button class="primary" onclick="showPage('tools')">Explore Tools →</button>
+  </div>
+  <div class="storage">Browser Storage <span id="storageLabel">Local workspace</span><div class="track"><span></span></div></div>
+</aside>
+
+<main>
+<header class="topbar">
+  <button class="top-action mobile-menu" onclick="toggleSidebar()">☰</button>
+  <div class="search"><span>⌕</span><input id="search" placeholder="Search anything... (Ctrl + K)" autocomplete="off"></div>
+  <button class="top-action" onclick="toggleTheme()" title="Change appearance">☼</button>
+  <button class="top-action" onclick="notify('You are all caught up!')" title="Notifications">♧</button>
+  <div class="user"><div class="avatar">A</div><div class="user-label">AMZO User<small>Creator</small></div></div>
+</header>
+
+<div class="content">
+<div class="layout">
+<div class="main-column">
+
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">WELCOME TO AMZO</div>
+      <h1>Great things<br>start <span>here.</span></h1>
+      <p>Your all-in-one platform for creating, learning, working and having fun. Everything you need, right here in AMZO.</p>
+      <button class="primary" onclick="showPage('tools')">Explore Tools &nbsp; →</button>
+    </div>
+    <div class="hero-links">
+      <button onclick="showPage('ai')"><span class="mini-icon">✦</span><span>AI Assistant<small>Chat, create, solve</small></span></button>
+      <button onclick="showPage('projects')"><span class="mini-icon" style="background:#075e5b">▣</span><span>Projects<small>Build your ideas</small></span></button>
+      <button onclick="showPage('games')"><span class="mini-icon" style="background:#6522a1">🎮</span><span>Games<small>Play & relax</small></span></button>
+      <button onclick="showPage('tools')"><span class="mini-icon">⚒</span><span>Tools<small>Do more, faster</small></span></button>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-head"><h2>Quick Access</h2><button class="text-link" onclick="showPage('tools')">View All →</button></div>
+    <div class="quick-grid">
+      <button class="quick" onclick="showPage('ai')"><span class="tile-icon">✦</span><strong>AI Assistant</strong><small>Open workspace</small></button>
+      <button class="quick" onclick="showPage('tools')"><span class="tile-icon cyan">‹/›</span><strong>Code Pad</strong><small>Write & preview</small></button>
+      <button class="quick" onclick="showPage('gallery')"><span class="tile-icon teal">▧</span><strong>Gallery</strong><small>Visual collection</small></button>
+      <button class="quick" onclick="showPage('games')"><span class="tile-icon violet">▶</span><strong>Game Hub</strong><small>Play & relax</small></button>
+      <button class="quick" onclick="showPage('notes')"><span class="tile-icon gold">▤</span><strong>Notes</strong><small>Save thoughts</small></button>
+      <button class="quick" onclick="showPage('files')"><span class="tile-icon">▱</span><strong>File Manager</strong><small>Open local files</small></button>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Recent Projects</h2><button class="text-link" onclick="showPage('projects')">View All →</button></div>
+    <div class="project-grid" id="recentProjects"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><h2>Featured Tools</h2><button class="text-link" onclick="showPage('tools')">View All →</button></div>
+    <div class="tool-grid">
+      <button class="tool" onclick="showPage('ai')"><span class="tile-icon teal">✧</span><strong>AI Workspace</strong><small>Ideas & prompts</small></button>
+      <button class="tool" onclick="showPage('tools')"><span class="tile-icon">⌘</span><strong>Code Pad</strong><small>HTML preview</small></button>
+      <button class="tool" onclick="showPage('gallery')"><span class="tile-icon violet">▧</span><strong>Gallery</strong><small>Your inspiration</small></button>
+      <button class="tool" onclick="showPage('projects')"><span class="tile-icon cyan">◈</span><strong>Project Hub</strong><small>Organize ideas</small></button>
+      <button class="tool" onclick="showPage('notes')"><span class="tile-icon gold">▤</span><strong>Quick Notes</strong><small>Remember more</small></button>
+      <button class="tool" onclick="showPage('settings')"><span class="tile-icon">⚙</span><strong>Preferences</strong><small>Make it yours</small></button>
+    </div>
+  </section>
+</section>
+
+<section class="page" id="page-ai">
+  <h1 class="page-title">AI Assistant</h1><p class="page-intro">Your space for ideas, prompts and creative work.</p>
+  <div class="panel"><h2>What are we creating today?</h2><p class="muted">Write an idea or prepare a prompt to use with your preferred AI service.</p>
+  <textarea id="aiPrompt" placeholder="Describe your idea, project or question..."></textarea>
+  <div class="row-buttons"><button class="primary" onclick="preparePrompt()">Prepare Prompt →</button><button class="secondary" onclick="document.getElementById('aiPrompt').value=''">Clear</button></div>
+  <div id="promptResult" class="muted"></div></div>
+  <div class="panel"><h2>Prompt Library</h2><p class="muted">Choose a starter prompt and customize it.</p>
+  <div class="row-buttons"><button class="secondary" onclick="usePrompt('Give me 10 original website ideas with useful features and a premium visual identity.')">Website ideas</button><button class="secondary" onclick="usePrompt('Help me plan a complete beginner-friendly coding project, step by step.')">Coding project</button><button class="secondary" onclick="usePrompt('Help me organize my week into simple, achievable tasks.')">Planning</button></div></div>
+</section>
+
+<section class="page" id="page-projects">
+  <h1 class="page-title">Your Projects</h1><p class="page-intro">Collect your ideas and keep your next creation organized.</p>
+  <div class="panel"><h2>Create a project</h2><label>Project name</label><input id="projectName" placeholder="e.g. My next website"><label>Short description</label><input id="projectDesc" placeholder="What are you building?"><div class="row-buttons"><button class="primary" onclick="addProject()">＋ Add Project</button></div></div>
+  <div id="projectList"></div>
+</section>
+
+<section class="page" id="page-tools">
+  <h1 class="page-title">Smart Tools</h1><p class="page-intro">A practical collection of utilities for your everyday workflow.</p>
+  <div class="panel"><h2>Text utility</h2><textarea id="textInput" placeholder="Paste or type your text here..."></textarea><div class="row-buttons"><button class="primary" onclick="transformText('upper')">UPPERCASE</button><button class="secondary" onclick="transformText('lower')">lowercase</button><button class="secondary" onclick="transformText('clean')">Clean spaces</button><button class="secondary" onclick="copyText('textInput')">Copy text</button></div><p id="textStats" class="muted">0 words · 0 characters</p></div>
+  <div class="panel"><h2>Code Pad</h2><p class="muted">Write HTML and preview it locally in a separate window.</p><textarea id="codeInput" style="min-height:180px;font-family:monospace" placeholder="&lt;h1&gt;Hello AMZO&lt;/h1&gt;"></textarea><div class="row-buttons"><button class="primary" onclick="previewCode()">▶ Preview HTML</button><button class="secondary" onclick="downloadCode()">Download HTML</button></div></div>
+  <div class="panel"><h2>Quick calculator</h2><input id="calcInput" placeholder="Example: (25 + 15) * 2"><div class="row-buttons"><button class="primary" onclick="calculate()">Calculate</button></div><p id="calcResult" class="muted"></p></div>
+</section>
+
+<section class="page" id="page-games">
+  <h1 class="page-title">Game Hub</h1><p class="page-intro">A simple collection of browser games and entertainment links.</p>
+  <div class="project-grid">
+    <div class="project"><div class="project-art art3">🔢</div><strong>2048</strong><small>Merge tiles and beat your score.</small><button class="secondary" style="margin-top:12px;width:100%" onclick="window.open('https://play2048.co/','_blank')">Play game ↗</button></div>
+    <div class="project"><div class="project-art art2">♟</div><strong>Chess</strong><small>Play a classic strategy game.</small><button class="secondary" style="margin-top:12px;width:100%" onclick="window.open('https://lichess.org/','_blank')">Play game ↗</button></div>
+    <div class="project"><div class="project-art">🧩</div><strong>Puzzle Games</strong><small>Explore free online games.</small><button class="secondary" style="margin-top:12px;width:100%" onclick="window.open('https://www.crazygames.com/','_blank')">Explore ↗</button></div>
+    <div class="project"><div class="project-art art4">🎮</div><strong>Game Library</strong><small>Discover browser games.</small><button class="secondary" style="margin-top:12px;width:100%" onclick="window.open('https://itch.io/games/free','_blank')">Browse ↗</button></div>
+  </div>
+</section>
+
+<section class="page" id="page-notes">
+  <h1 class="page-title">Notes</h1><p class="page-intro">Capture ideas. Your notes are saved in this browser.</p>
+  <div class="panel"><label>Note title</label><input id="noteTitle" placeholder="Give your note a title"><label>Note content</label><textarea id="noteBody" placeholder="Write anything you want to remember..."></textarea><div class="row-buttons"><button class="primary" onclick="saveNote()">Save Note</button><button class="secondary" onclick="clearNoteForm()">Clear</button></div></div>
+  <div id="noteList"></div>
+</section>
+
+<section class="page" id="page-files">
+  <h1 class="page-title">Files</h1><p class="page-intro">Select files from your computer. Nothing is uploaded to a server.</p>
+  <div class="panel"><h2>Local file picker</h2><input type="file" id="filePicker" multiple><div id="fileResults" class="muted"></div></div>
+  <div class="panel"><h2>Workspace data</h2><p class="muted">Export your AMZO projects, notes and preferences as a JSON backup.</p><button class="primary" onclick="exportBackup()">Export Backup</button><label style="margin-top:18px">Restore a backup</label><input type="file" id="restoreFile" accept=".json,application/json"><button class="secondary" onclick="restoreBackup()">Restore Backup</button></div>
+</section>
+
+<section class="page" id="page-gallery">
+  <h1 class="page-title">Gallery</h1><p class="page-intro">Your visual inspiration space. Add images from your device.</p>
+  <div class="panel"><input type="file" id="galleryPicker" accept="image/*" multiple><p class="muted">Images are displayed from your selected files and aren't uploaded.</p></div>
+  <div id="galleryGrid" class="project-grid"></div>
+</section>
+
+<section class="page" id="page-settings">
+  <h1 class="page-title">Settings</h1><p class="page-intro">Personalize your AMZO workspace.</p>
+  <div class="panel"><h2>Profile</h2><label>Display name</label><input id="displayName" placeholder="AMZO User"><label>Accent color</label><select id="accentSelect"><option value="#3478ff">Electric Blue</option><option value="#8b5cf6">Violet</option><option value="#14b8a6">Teal</option><option value="#ec4899">Pink</option></select><div class="row-buttons"><button class="primary" onclick="saveSettings()">Save Settings</button><button class="secondary" onclick="toggleTheme()">Toggle Light / Dark</button></div></div>
+  <div class="panel"><h2>Local workspace</h2><p class="muted">Your notes and projects use browser storage on this device.</p><button class="secondary" onclick="exportBackup()">Download Backup</button></div>
+</section>
+</div>
+
+<aside class="right">
+  <div class="quote"><div class="eyebrow">DAILY REMINDER</div><blockquote id="quoteText">“Discipline today builds freedom tomorrow.”</blockquote><small>— AMZO</small></div>
+  <section class="section">
+    <div class="section-head"><h2>Your Stats</h2><button class="text-link" onclick="notify('Your workspace at a glance.')">Details →</button></div>
+    <div class="stat-list">
+      <div class="stat"><span class="tile-icon">▣</span><div class="stat-info"><small>Projects</small><strong id="statProjects">4</strong></div><span class="change">Your work</span></div>
+      <div class="stat"><span class="tile-icon teal">✓</span><div class="stat-info"><small>Notes Saved</small><strong id="statNotes">0</strong></div><span class="change">Local</span></div>
+      <div class="stat"><span class="tile-icon violet">◷</span><div class="stat-info"><small>Workspace</small><strong>Ready</strong></div><span class="change">● Active</span></div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="section-head"><h2>Recent Activity</h2><button class="text-link" onclick="notify('This list reflects your local workspace.')">View →</button></div>
+    <div class="activity" id="activityList">
+      <div class="activity-item"><span class="tile-icon">✧</span><div><strong>Welcome to AMZO</strong><small>Your workspace is ready</small></div></div>
+      <div class="activity-item"><span class="tile-icon gold">▤</span><div><strong>Explore your tools</strong><small>Open Smart Tools to get started</small></div></div>
+    </div>
+  </section>
+  <div class="connect"><h2>Stay Connected</h2><p>Discover new ideas and keep creating something amazing.</p><button class="primary" onclick="window.open('https://github.com/','_blank')">⌘ Explore GitHub ↗</button></div>
+</aside>
+</div>
+</div>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem('amzo_'+key))??fallback}catch{return fallback}};
+const put=(key,value)=>{try{localStorage.setItem('amzo_'+key,JSON.stringify(value))}catch{notify('Browser storage is full. Export a backup.')}};
+let projects=get('projects',[
+ {name:'Website Redesign',desc:'Web Design · Personal project',icon:'🏔️',art:''},
+ {name:'AI Tool Collection',desc:'Development · Ideas',icon:'💻',art:'art2'},
+ {name:'Gaming Hub',desc:'Gaming · Entertainment',icon:'🎮',art:'art3'},
+ {name:'Creative Portfolio',desc:'Design · Inspiration',icon:'🌌',art:'art4'}
+]);
+let notes=get('notes',[]);
+let activity=get('activity',[]);
+let isLight=get('light',false);
+
+function notify(message){
+ const t=$('toast');t.textContent=message;t.style.display='block';
+ clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',2600);
+}
+function record(message){
+ activity.unshift({message,time:new Date().toLocaleString()});activity=activity.slice(0,8);put('activity',activity);renderActivity();
+}
+function toggleSidebar(){$('sidebar').classList.toggle('open')}
+function showPage(name){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ const page=$('page-'+name);if(page)page.classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+ $('sidebar').classList.remove('open');
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+$('nav').addEventListener('click',e=>{const b=e.target.closest('button[data-page]');if(b)showPage(b.dataset.page)});
+document.addEventListener('keydown',e=>{
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('search').focus()}
+ if(e.key==='Escape'){$('sidebar').classList.remove('open');$('search').value='';}
+});
+$('search').addEventListener('keydown',e=>{if(e.key==='Enter')searchSite(e.target.value)});
+function searchSite(query){
+ query=query.trim().toLowerCase();if(!query)return;
+ const pages={home:'home',dashboard:'home','ai assistant':'ai',ai:'ai',projects:'projects',tools:'tools','smart tools':'tools',games:'games',notes:'notes',files:'files',gallery:'gallery',settings:'settings'};
+ const exact=Object.keys(pages).find(k=>k.includes(query)||query.includes(k));
+ if(exact){showPage(pages[exact]);return}
+ const found=projects.find(p=>(p.name+' '+p.desc).toLowerCase().includes(query))||notes.find(n=>(n.title+' '+n.body).toLowerCase().includes(query));
+ if(found){showPage(found.name?'projects':'notes');notify('Found: '+(found.name||found.title))}
+ else notify('No match found. Try a section name.');
+}
+function renderProjects(){
+ $('recentProjects').innerHTML=projects.slice(0,4).map(p=>`<div class="project"><div class="project-art ${p.art||''}">${esc(p.icon||'◈')}</div><strong>${esc(p.name)}</strong><small>${esc(p.desc||'Personal project')}</small></div>`).join('');
+ $('projectList').innerHTML=projects.length?projects.map((p,i)=>`<div class="saved-item"><div><strong>${esc(p.icon||'◈')} ${esc(p.name)}</strong><br><small>${esc(p.desc||'Personal project')}</small></div><button class="secondary" onclick="deleteProject(${i})">Delete</button></div>`).join(''):'<p class="empty">No projects yet. Create your first one above.</p>';
+ $('statProjects').textContent=projects.length;
+}
+function addProject(){
+ const name=$('projectName').value.trim(),desc=$('projectDesc').value.trim();
+ if(!name){notify('Enter a project name first.');return}
+ projects.unshift({name,desc:desc||'Personal project',icon:'◈',art:'art3'});
+ put('projects',projects);renderProjects();record('Created project: '+name);
+ $('projectName').value='';$('projectDesc').value='';notify('Project created!');
+}
+function deleteProject(i){const p=projects[i];projects.splice(i,1);put('projects',projects);renderProjects();record('Deleted project: '+p.name);notify('Project deleted.')}
+function renderNotes(){
+ $('noteList').innerHTML=notes.length?notes.map((n,i)=>`<div class="saved-item"><div><strong>${esc(n.title)}</strong><br><small>${esc(n.body).slice(0,160)}</small></div><button class="secondary" onclick="editNote(${i})">Edit</button><button class="secondary" onclick="deleteNote(${i})">Delete</button></div>`).join(''):'<p class="empty">Your saved notes will appear here.</p>';
+ $('statNotes').textContent=notes.length;
+}
+function saveNote(){
+ const title=$('noteTitle').value.trim(),body=$('noteBody').value.trim();
+ if(!title||!body){notify('Add a title and note content.');return}
+ notes.unshift({title,body});put('notes',notes);renderNotes();record('Saved note: '+title);clearNoteForm();notify('Note saved in this browser.');
+}
+function editNote(i){$('noteTitle').value=notes[i].title;$('noteBody').value=notes[i].body;notes.splice(i,1);put('notes',notes);renderNotes();showPage('notes')}
+function deleteNote(i){notes.splice(i,1);put('notes',notes);renderNotes();notify('Note deleted.')}
+function clearNoteForm(){$('noteTitle').value='';$('noteBody').value=''}
+function renderActivity(){
+ const items=activity.slice(0,5);
+ $('activityList').innerHTML=items.length?items.map(a=>`<div class="activity-item"><span class="tile-icon">✦</span><div><strong>${esc(a.message)}</strong><small>${esc(a.time)}</small></div></div>`).join(''):'<p class="muted">Your recent activity will appear here.</p>';
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function preparePrompt(){
+ const text=$('aiPrompt').value.trim();if(!text){notify('Write an idea first.');return}
+ $('promptResult').textContent='Your prompt is ready. Copy it and paste it into your chosen AI service.';
+ const old=$('promptCopy');if(old)old.remove();
+ const b=document.createElement('button');b.id='promptCopy';b.className='secondary';b.textContent='Copy prompt';
+ b.onclick=()=>GenCopy(text);$('promptResult').after(b);record('Prepared an AI prompt');
+}
+function GenCopy(text){
+ if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(text).then(()=>notify('Copied!')).catch(()=>fallbackCopy(text));
+ else fallbackCopy(text);
+}
+function fallbackCopy(text){const t=document.createElement('textarea');t.value=text;document.body.append(t);t.select();try{document.execCommand('copy');notify('Copied!')}catch{notify('Select and copy the text manually.')}t.remove()}
+function usePrompt(text){$('aiPrompt').value=text;showPage('ai')}
+function transformText(mode){
+ const t=$('textInput');if(mode==='upper')t.value=t.value.toUpperCase();if(mode==='lower')t.value=t.value.toLowerCase();if(mode==='clean')t.value=t.value.replace(/\s+/g,' ').trim();
+ const s=t.value.trim();$('textStats').textContent=s?(s.split(/\s+/).length+' words · '+t.value.length+' characters'):'0 words · 0 characters';
+}
+$('textInput').addEventListener('input',()=>{const s=$('textInput').value.trim();$('textStats').textContent=(s?s.split(/\s+/).length:0)+' words · '+$('textInput').value.length+' characters'});
+function copyText(id){GenCopy($(id).value)}
+function previewCode(){
+ const code=$('codeInput').value;if(!code.trim()){notify('Enter some HTML first.');return}
+ const w=window.open('','_blank');if(!w){notify('Allow pop-ups to preview your code.');return}
+ w.document.open();w.document.write(code);w.document.close();
+}
+function downloadCode(){
+ const code=$('codeInput').value;if(!code.trim()){notify('Enter some HTML first.');return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([code],{type:'text/html'}));a.download='amzo-page.html';a.click();URL.revokeObjectURL(a.href);
+}
+function calculate(){
+ const exp=$('calcInput').value.trim();
+ if(!/^[0-9+\-*/().%\s]+$/.test(exp)||!exp){$('calcResult').textContent='Enter a valid arithmetic expression.';return}
+ try{
+  const tokens=exp.match(/\d*\.?\d+|[()+\-*/%]/g)||[];
+  if(tokens.join('')!==exp.replace(/\s/g,''))throw Error();
+  const result=Function('"use strict";return ('+exp+')')();
+  $('calcResult').textContent=Number.isFinite(result)?'Result: '+result:'Invalid calculation';
+ }catch{$('calcResult').textContent='Invalid expression.'}
+}
+function toggleTheme(){
+ isLight=!isLight;put('light',isLight);
+ if(isLight){
+  document.documentElement.style.setProperty('--bg','#edf3fb');document.documentElement.style.setProperty('--panel','#fff');document.documentElement.style.setProperty('--card','#fff');document.documentElement.style.setProperty('--line','#d4deeb');document.documentElement.style.setProperty('--text','#13253d');document.documentElement.style.setProperty('--muted','#60738c');
+  document.querySelectorAll('.sidebar,.topbar,.quick,.tool,.project,.panel,.stat-list,.activity').forEach(el=>{el.dataset.oldBg=el.style.background;el.style.background='#fff'});
+ }else{
+  ['--bg','#020b17','--panel','#061426','--card','#071629','--line','#152b46','--text','#edf4ff','--muted','#91a7c4'].reduce((_,v,i,a)=>{if(i%2===0)document.documentElement.style.setProperty(v,a[i+1]);return 0},0);
+  document.querySelectorAll('[data-old-bg]').forEach(el=>{el.style.background=el.dataset.oldBg;delete el.dataset.oldBg});
+ }
+}
+function saveSettings(){
+ const name=$('displayName').value.trim();
+ if(name){document.querySelector('.user-label').innerHTML=esc(name)+'<small>Creator</small>';put('displayName',name)}
+ document.documentElement.style.setProperty('--blue',$('accentSelect').value);
+ put('accent',$('accentSelect').value);notify('Settings saved.');record('Updated workspace settings');
+}
+$('filePicker').addEventListener('change',e=>{
+ const files=[...e.target.files];$('fileResults').textContent=files.length?files.map(f=>f.name+' ('+Math.round(f.size/1024)+' KB)').join(' · '):'No files selected.';
+});
+$('galleryPicker').addEventListener('change',e=>{
+ const grid=$('galleryGrid');grid.innerHTML='';
+ [...e.target.files].forEach(file=>{
+  if(!file.type.startsWith('image/'))return;
+  const card=document.createElement('div');card.className='project';
+  const img=document.createElement('img');img.src=URL.createObjectURL(file);img.alt=file.name;img.style.cssText='width:100%;height:130px;object-fit:cover;border-radius:8px';
+  const label=document.createElement('small');label.textContent=file.name;
+  card.append(img,label);grid.append(card);
+ });
+});
+function exportBackup(){
+ const data={projects,notes,activity,displayName:get('displayName','AMZO User'),accent:get('accent','#3478ff'),light:isLight};
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='amzo-backup.json';a.click();URL.revokeObjectURL(a.href);notify('Backup downloaded.');
+}
+function restoreBackup(){
+ const file=$('restoreFile').files[0];if(!file){notify('Choose a JSON backup first.');return}
+ const r=new FileReader();r.onload=()=>{
+ try{const d=JSON.parse(r.result);if(!d||!Array.isArray(d.projects)||!Array.isArray(d.notes))throw Error();
+ projects=d.projects;notes=d.notes;activity=Array.isArray(d.activity)?d.activity:[];put('projects',projects);put('notes',notes);put('activity',activity);renderProjects();renderNotes();renderActivity();notify('Backup restored.');
+ }catch{notify('Invalid AMZO backup file.')}
+ };r.readAsText(file);
+}
+function toggleThemeInitial(){
+ if(!isLight)return;
+ document.documentElement.style.setProperty('--bg','#edf3fb');document.documentElement.style.setProperty('--line','#d4deeb');document.documentElement.style.setProperty('--text','#13253d');document.documentElement.style.setProperty('--muted','#60738c');
+}
+renderProjects();renderNotes();renderActivity();toggleThemeInitial();
+if(get('displayName',''))$('displayName').value=get('displayName','');
+if(get('accent','')){$('accentSelect').value=get('accent');document.documentElement.style.setProperty('--blue',get('accent'))}
+</script>
+</body>
+</html>
